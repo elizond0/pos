@@ -15,5 +15,6 @@ main.js内引入,并全局Vue.use
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 
-
+$ npm install axios --save
+在pos组件内import axios from 'axios'
 
