@@ -17,4 +17,12 @@ import 'element-ui/lib/theme-default/index.css'
 
 $ npm install axios --save
 在pos组件内import axios from 'axios'
+钩子函数created拉取远端数据
+
+实现订单操作方法
+vue的filter传入箭头函数,要注意花括号的使用
+slot-scope替代scope,v2.5后的更改
+利用elementUI提供的$message回复
+
+项目打包注意config下index.js的路径assetsPublicPath:'./',绝对路径=>相对路径
 

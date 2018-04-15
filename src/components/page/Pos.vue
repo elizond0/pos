@@ -5,20 +5,25 @@
         <el-tabs class='order-tabs'>
           <el-tab-pane label='点餐'>
             <el-table :data='tableData' border style='width:100%'>
-              <el-table-column prop='goodsName' label='商品名称'>商品名称</el-table-column>
-              <el-table-column prop='count' label='数量' width='50'>数量</el-table-column>
-              <el-table-column prop='price' label='金额' width='70'>金额</el-table-column>
+              <el-table-column prop='goodsName' label='商品名称'></el-table-column>
+              <el-table-column prop='count' label='数量' width='50'></el-table-column>
+              <el-table-column prop='price' label='单价' width='70'></el-table-column>
               <el-table-column label='操作' width='100' fixed='right'>
-                <template scope='scope'>
-                  <el-button type='text' size='small'>删除</el-button>
-                  <el-button type='text' size='small'>增加</el-button>
+                <template slot-scope='scope'>
+                  <el-button type='text' size='small' @click='delSingleGoods(scope.row)'>删除</el-button>
+                  <el-button type='text' size='small' @click="addOrderList(scope.row)">增加</el-button>
                 </template>
               </el-table-column>
             </el-table>
+
+            <div class='totalDiv'>
+              <small>数量</small>:{{totalCount}}<small>总额</small>:{{totalMoney}}
+            </div>
+
             <div class='order-btn'>
               <el-button type='warning'>挂单</el-button>
-              <el-button type='danger'>删除</el-button>
-              <el-button type='success'>结账</el-button>
+              <el-button type='danger' @click="delAllGoods()">清空</el-button>
+              <el-button type='success' @click='checkOut()'>结账</el-button>
             </div>
           </el-tab-pane>
           <el-tab-pane label='挂单'>挂单</el-tab-pane>
@@ -31,7 +36,7 @@
           <div class='title'>常用商品</div>
           <div class='often-goods-list'>
             <ul>
-              <li v-for='goods in oftenGoods'>
+              <li v-for='goods in oftenGoods' @click='addOrderList(goods)' :key='goods.goodsId'>
                 <span>{{goods.goodsName}}</span>
                 <span class='o-price'>${{goods.price}}元</span>
               </li>
@@ -44,7 +49,7 @@
             <el-tab-pane label='汉堡'>
                 <div>
                   <ul class="cookList">
-                    <li v-for="goods in type0Goods">
+                    <li v-for="goods in type0Goods" @click='addOrderList(goods)' :key='goods.goodsId'>
                       <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
                       <span class="foodName">{{goods.goodsName}}</span>
                       <span class="foodPrice">￥{{goods.price}}元</span>
@@ -55,7 +60,7 @@
             <el-tab-pane label='小食'>
                 <div>
                   <ul class="cookList">
-                    <li v-for="goods in type1Goods">
+                    <li v-for="goods in type1Goods" @click='addOrderList(goods)' :key='goods.goodsId'>
                       <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
                       <span class="foodName">{{goods.goodsName}}</span>
                       <span class="foodPrice">￥{{goods.price}}元</span>
@@ -66,7 +71,7 @@
             <el-tab-pane label='饮料'>
                 <div>
                   <ul class="cookList">
-                    <li v-for="goods in type2Goods">
+                    <li v-for="goods in type2Goods" @click='addOrderList(goods)' :key='goods.goodsId'>
                       <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
                       <span class="foodName">{{goods.goodsName}}</span>
                       <span class="foodPrice">￥{{goods.price}}元</span>
@@ -77,7 +82,7 @@
             <el-tab-pane label='套餐'>
                 <div>
                   <ul class="cookList">
-                    <li v-for="goods in type3Goods">
+                    <li v-for="goods in type3Goods" @click='addOrderList(goods)' :key='goods.goodsId'>
                       <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
                       <span class="foodName">{{goods.goodsName}}</span>
                       <span class="foodPrice">￥{{goods.price}}元</span>
@@ -94,71 +99,135 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   name: "pos",
   data() {
     return {
-      tableData: [
-        {
-          goodsName: "可口可乐",
-          price: 8,
-          count: 1
-        },
-        {
-          goodsName: "香辣鸡腿堡",
-          price: 15,
-          count: 1
-        },
-        {
-          goodsName: "爱心薯条",
-          price: 8,
-          count: 1
-        },
-        {
-          goodsName: "甜筒",
-          price: 8,
-          count: 1
-        }
-      ],
+      tableData: [],
       oftenGoods: [],
       type0Goods: [],
       type1Goods: [],
       type2Goods: [],
       type3Goods: [],
+      totalMoney: 0,
+      totalCount: 0
     };
   },
-  created:function(){
-    axios.get('http://jspang.com/DemoApi/oftenGoods.php')
-    .then(response=>{
-      console.log('response')
-      // console.log(response)
-      this.oftenGoods=response.data
-    })
-    .catch(error=>{
-      console.log('error')
-      // console.log(error)
-    })
+  created: function() {
+    axios
+      .get("http://jspang.com/DemoApi/oftenGoods.php")
+      .then(response => {
+        //console.log('response')
+        // console.log(response)
+        this.oftenGoods = response.data;
+      })
+      .catch(error => {
+        //console.log('error')
+        // console.log(error)
+      });
 
-    axios.get('http://jspang.com/DemoApi/typeGoods.php')
-    .then(response=>{
-      console.log('response')
-      // console.log(response)
-      this.type0Goods=response.data[0]
-      this.type1Goods=response.data[1]
-      this.type2Goods=response.data[2]
-      this.type3Goods=response.data[3]
-    })
-    .catch(error=>{
-      console.log('error')
-      // console.log(error)
-    })
+    axios
+      .get("http://jspang.com/DemoApi/typeGoods.php")
+      .then(response => {
+        console.log("response");
+        // console.log(response)
+        this.type0Goods = response.data[0];
+        this.type1Goods = response.data[1];
+        this.type2Goods = response.data[2];
+        this.type3Goods = response.data[3];
+      })
+      .catch(error => {
+        console.log("error");
+        // console.log(error)
+      });
   },
   mounted: function() {
     //在所有虚拟dom加载完成后执行
     var orderHeight = document.body.clientWidth;
     document.getElementById("order-list").style.height = orderHeight + "px";
+  },
+  methods: {
+    addOrderList(goods) {
+      //订单新增行
+
+      this.totalMoney = 0;
+      this.totalCount = 0;
+
+      //增加订单
+      //列表中商品是否已经存在
+      let isHave = false;
+      for (let i = 0; i < this.tableData.length; i++) {
+        if (this.tableData[i].goodsId === goods.goodsId) {
+          isHave = true;
+        }
+      }
+      // console.log(isHave)
+      if (isHave) {
+        // 改变商品数量
+        // console.log(this.tableData);
+        let arr = this.tableData.filter(obj => {
+          // console.log(obj.goodsId===goods.goodsId)
+          return obj.goodsId === goods.goodsId;
+        });
+        // console.log(arr);
+        arr[0].count++;
+      } else {
+        // 新增商品项目
+        let newGoods = {
+          goodsId: goods.goodsId,
+          goodsName: goods.goodsName,
+          price: goods.price,
+          count: 1
+        };
+        this.tableData.push(newGoods);
+      }
+      this.getAllMoney();
+    },
+    delSingleGoods(goods) {
+      //删除当前行
+      this.tableData = this.tableData.filter(obj => {
+        return obj.goodsId !== goods.goodsId;
+      });
+      this.getAllMoney();
+    },
+    delAllGoods() {
+      //删除所有
+      this.totalMoney = 0;
+      this.totalCount = 0;
+      this.tableData = [];
+    },
+    getAllMoney() {
+      //计算总额和数量
+      this.totalMoney = 0;
+      this.totalCount = 0;
+      if (this.tableData) {
+        this.tableData.forEach(el => {
+          this.totalCount += el.count;
+          this.totalMoney += el.count * el.price;
+        });
+      }
+    },
+    checkOut() {
+      //结账
+      if (this.totalCount) {
+        this.totalMoney = 0;
+        this.totalCount = 0;
+        this.tableData = [];
+
+        this.$message({
+          message:'结账成功',
+          type:'success'
+        })
+      }else{
+        //   this.$message({
+        //   message:'订单为空',
+        //   type:'error'  
+        // })
+        this.$message.error('订单为空')
+      }
+    }
   }
 };
 </script>
@@ -228,5 +297,10 @@ export default {
   font-size: 16px;
   padding-left: 10px;
   padding-top: 10px;
+}
+.totalDiv {
+  background-color: #fff;
+  padding: 10px;
+  border-bottom: 1px solid #d3dce6;
 }
 </style>
