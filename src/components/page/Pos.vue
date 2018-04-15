@@ -53,13 +53,37 @@
                 </div>
             </el-tab-pane>
             <el-tab-pane label='小食'>
-                小食
+                <div>
+                  <ul class="cookList">
+                    <li v-for="goods in type1Goods">
+                      <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
+                      <span class="foodName">{{goods.goodsName}}</span>
+                      <span class="foodPrice">￥{{goods.price}}元</span>
+                    </li>
+                  </ul>
+                </div>
             </el-tab-pane>
             <el-tab-pane label='饮料'>
-                饮料
+                <div>
+                  <ul class="cookList">
+                    <li v-for="goods in type2Goods">
+                      <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
+                      <span class="foodName">{{goods.goodsName}}</span>
+                      <span class="foodPrice">￥{{goods.price}}元</span>
+                    </li>
+                  </ul>
+                </div>
             </el-tab-pane>
             <el-tab-pane label='套餐'>
-                套餐
+                <div>
+                  <ul class="cookList">
+                    <li v-for="goods in type3Goods">
+                      <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
+                      <span class="foodName">{{goods.goodsName}}</span>
+                      <span class="foodPrice">￥{{goods.price}}元</span>
+                    </li>
+                  </ul>
+                </div>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -121,7 +145,10 @@ export default {
     .then(response=>{
       console.log('response')
       // console.log(response)
-      this.oftenGoods=response.data
+      this.type0Goods=response.data[0]
+      this.type1Goods=response.data[1]
+      this.type2Goods=response.data[2]
+      this.type3Goods=response.data[3]
     })
     .catch(error=>{
       console.log('error')
